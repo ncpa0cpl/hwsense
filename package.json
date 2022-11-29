@@ -1,0 +1,53 @@
+{
+  "name": "test-gjs-renderer",
+  "packageManager": "yarn@1.22.19",
+  "devDependencies": {
+    "@swc/core": "latest",
+    "@swc/jest": "latest",
+    "@types/jest": "latest",
+    "@types/react": "^18.0.25",
+    "@typescript-eslint/eslint-plugin": "latest",
+    "@typescript-eslint/parser": "latest",
+    "esbuild": "^0.15.13",
+    "esbuild-plugin-resolve": "^1.0.3",
+    "eslint": "latest",
+    "eslint-config-prettier": "latest",
+    "eslint-plugin-prettier": "latest",
+    "husky": "latest",
+    "jest": "latest",
+    "ncpa0cpl": "ncpa0cpl/git-hook-tasks",
+    "prettier": "latest",
+    "prettier-plugin-jsdoc": "latest",
+    "typescript": "latest"
+  },
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "scripts": {
+    "fix:lint": "eslint --fix .",
+    "fix:prettier": "prettier -w ./src .",
+    "test:jest": "jest --coverage",
+    "test:lint": "eslint .",
+    "test:prettier": "prettier -c ./src && prettier -c ./__tests__",
+    "test:tsc": "tsc --noEmit",
+    "build": "node ./scripts/build.cjs",
+    "build:dev": "node ./scripts/build.cjs --dev",
+    "start": "yarn build && gjs -m ./dist/index.js",
+    "start:dev": "yarn build --dev && gjs -m ./dist/index.js"
+  },
+  "keywords": [],
+  "repository": {
+    "url": ""
+  },
+  "description": "",
+  "license": "MIT",
+  "author": {
+    "name": "Szymon Bretner",
+    "email": ""
+  },
+  "resolutions": {
+    "react-gjs-renderer": "portal:/home/owner/Documents/react-gjs-renderer"
+  },
+  "dependencies": {
+    "react": "^18.2.0"
+  }
+}
