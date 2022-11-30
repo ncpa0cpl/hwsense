@@ -36,7 +36,7 @@ async function main() {
       outfile,
       plugins: [
         resolve({
-          react: "/home/owner/Documents/test-gjs-renderer/node_modules/react",
+          react: "/home/owner/Documents/hwsense/node_modules/react",
         }),
       ],
     });
