@@ -1,24 +1,34 @@
 import React from "react";
+import { sleep } from "../utils/sleep";
 
-export const usePooling = <T>(poolFn: () => T, init: T, interval: number) => {
+export const usePooling = <T>(
+  poolFn: () => T | Promise<T>,
+  init: T,
+  interval: number
+) => {
   const [value, setValue] = React.useState(init);
 
   React.useEffect(() => {
-    const update = () => {
+    const update = async () => {
       try {
-        setValue(poolFn());
+        setValue(await poolFn());
       } catch (e) {
         console.error(e);
       }
     };
 
-    update();
+    let stop = false;
 
-    const intervalId = setInterval(() => {
-      update();
-    }, interval);
+    (async () => {
+      while (!stop) {
+        await update();
+        await sleep(interval);
+      }
+    })();
 
-    return () => clearInterval(intervalId);
+    return () => {
+      stop = true;
+    };
   }, [interval, poolFn]);
 
   return value;

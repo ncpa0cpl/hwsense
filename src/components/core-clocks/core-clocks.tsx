@@ -1,20 +1,26 @@
 import React from "react";
-import { Align, Box, Grid, GridItem } from "react-gjs-renderer";
+import {
+  Align,
+  Box,
+  Grid,
+  GridItem,
+  Orientation,
+  Separator,
+} from "react-gjs-renderer";
 import { Settings } from "../../global-state/settings";
 import { usePooling } from "../../hooks/use-pooling";
-import { Command } from "../../utils/run-cmd";
+import { Command } from "../../utils/command";
 import { Header } from "../header/header";
 import { Text } from "../text/text";
-import type { CoreClockViewProps } from "./components/core-clock-view";
 import { CoreClockView } from "./components/core-clock-view";
 
-const getCoreClocks = () => {
-  const cmd = new Command("grep", '"^[c]pu MHz"', "/proc/cpuinfo");
-  const result = cmd.run();
+const getCoreClocks = async () => {
+  const cmd = new Command("grep", "^[c]pu MHz", "/proc/cpuinfo");
+  const result = await cmd.run();
 
   const lines = result.split("\n");
 
-  const newCoreClocks: CoreClockViewProps[] = [];
+  const newCoreClocks: { num: number; freq: number }[] = [];
   for (const [index, line] of lines.entries()) {
     if (line.includes(":")) {
       const [, freq] = line.split(":");
@@ -32,6 +38,13 @@ export const CoreClocks = () => {
   const poolingRate = Settings.useCpuFreqPoolingRate();
   const cores = usePooling(getCoreClocks, [], poolingRate);
 
+  const [avg, setAvg] = React.useState(0);
+
+  React.useEffect(() => {
+    const sum = cores.reduce((acc, core) => acc + core.freq, 0);
+    setAvg(sum / cores.length);
+  }, [cores]);
+
   return (
     <Grid rowSpacing={10} columns={4}>
       <GridItem columnSpan={4}>
@@ -47,17 +60,25 @@ export const CoreClocks = () => {
       </GridItem>
       <GridItem>
         <Box margin={[0, 25]}>
-          <Text fontSize="large">Minimum</Text>
+          <Text fontSize="large">Lowest</Text>
         </Box>
       </GridItem>
       <GridItem>
         <Box margin={[0, 25]}>
-          <Text fontSize="large">Maximum</Text>
+          <Text fontSize="large">Highest</Text>
         </Box>
       </GridItem>
       {cores.map((core) => (
-        <CoreClockView key={core.num} {...core} />
+        <CoreClockView
+          key={core.num}
+          name={`Core ${core.num}`}
+          freq={core.freq}
+        />
       ))}
+      <GridItem columnSpan={4}>
+        <Separator orientation={Orientation.HORIZONTAL} />
+      </GridItem>
+      <CoreClockView name="Avg" freq={avg} />
     </Grid>
   );
 };

@@ -2,25 +2,27 @@ import React from "react";
 import { GridItem } from "react-gjs-renderer";
 import { Text } from "../../text/text";
 
-export type CoreClockViewProps = { num: number; freq: number };
+export type CoreClockViewProps = { name: string; freq: number };
 
 export const CoreClockView = (props: CoreClockViewProps) => {
   const [maxFreq, setMaxFreq] = React.useState(props.freq);
   const [minFreq, setMinFreq] = React.useState(props.freq);
 
   React.useEffect(() => {
-    if (props.freq > maxFreq) {
-      setMaxFreq(props.freq);
-    }
-    if (props.freq < minFreq) {
-      setMinFreq(props.freq);
+    if (props.freq) {
+      if (props.freq > maxFreq || maxFreq === 0) {
+        setMaxFreq(props.freq);
+      }
+      if (props.freq < minFreq || minFreq === 0) {
+        setMinFreq(props.freq);
+      }
     }
   }, [props.freq]);
 
   return (
     <>
       <GridItem>
-        <Text fontSize="medium">Core {props.num.toString()}</Text>
+        <Text fontSize="medium">{props.name}</Text>
       </GridItem>
       <GridItem>
         <Text fontSize="medium">{props.freq.toFixed(2)} MHz</Text>

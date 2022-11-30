@@ -1,23 +1,16 @@
 import React from "react";
 import { Align, Box, Grid, GridItem } from "react-gjs-renderer";
-import { Settings } from "../../global-state/settings";
-import { usePooling } from "../../hooks/use-pooling";
-import { Command } from "../../utils/run-cmd";
+import { Temps } from "../../global-state/temps";
 import { Header } from "../header/header";
+import { TempView } from "../temp-view/temp-view";
 import { Text } from "../text/text";
-import { CoreTempView } from "./components/core-temp-view";
 
-export type CoreTemps = Array<{ name: string; temp: number }>;
+export type CoreTemps = Array<{ name: string; value: number }>;
 
-const getTemps = (): CoreTemps => {
-  const cmd = new Command("sensors", "-j");
-  const result = cmd.run();
+const getCpuTemps = (temps: Record<string, any>): CoreTemps => {
+  const coretemps: Array<{ name: string; value: number }> = [];
 
-  const sensorData = JSON.parse(result);
-
-  const coretemps: Array<{ name: string; temp: number }> = [];
-
-  for (const [property, value] of Object.entries(sensorData)) {
+  for (const [property, value] of Object.entries(temps)) {
     if (property.startsWith("coretemp")) {
       for (const [name, temps] of Object.entries(value as object)) {
         if (name.startsWith("Package")) {
@@ -26,7 +19,7 @@ const getTemps = (): CoreTemps => {
           );
 
           if (tempKey) {
-            coretemps.unshift({ name: "Package", temp: temps[tempKey] });
+            coretemps.unshift({ name: "Package", value: temps[tempKey] });
           }
         }
 
@@ -36,7 +29,34 @@ const getTemps = (): CoreTemps => {
           );
 
           if (tempKey) {
-            coretemps.push({ name, temp: temps[tempKey] });
+            coretemps.push({ name, value: temps[tempKey] });
+          }
+        }
+      }
+
+      break;
+    }
+
+    if (property.startsWith("k10temp")) {
+      for (const [name, temps] of Object.entries(value as object)) {
+        if (name.startsWith("Tctl")) {
+          const tempKey = Object.keys(temps as object).find((key) =>
+            key.endsWith("_input")
+          );
+
+          if (tempKey) {
+            coretemps.unshift({ name: "Package", value: temps[tempKey] });
+          }
+        } else if (name.startsWith("Tccd")) {
+          const tempKey = Object.keys(temps as object).find((key) =>
+            key.endsWith("_input")
+          );
+
+          if (tempKey) {
+            coretemps.push({
+              name: `CCD ${name.replace("Tccd", "")}`,
+              value: temps[tempKey],
+            });
           }
         }
       }
@@ -49,8 +69,16 @@ const getTemps = (): CoreTemps => {
 };
 
 export const CoreTemps = () => {
-  const poolingRate = Settings.useCpuTempPoolingRate();
-  const coreTemps = usePooling(getTemps, [], poolingRate);
+  const [coreTemps, setCoreTemps] = React.useState<CoreTemps>([]);
+
+  React.useEffect(() => {
+    const sub = Temps.subscribe((temps) => {
+      const newCoreTemps = getCpuTemps(temps);
+      setCoreTemps(newCoreTemps);
+    });
+
+    return () => sub.cancel();
+  }, []);
 
   return (
     <Grid margin={[20, 0, 0]} rowSpacing={10} columns={4}>
@@ -67,16 +95,16 @@ export const CoreTemps = () => {
       </GridItem>
       <GridItem>
         <Box margin={[0, 25]}>
-          <Text fontSize="large">Minimum</Text>
+          <Text fontSize="large">Lowest</Text>
         </Box>
       </GridItem>
       <GridItem>
         <Box margin={[0, 25]}>
-          <Text fontSize="large">Maximum</Text>
+          <Text fontSize="large">Highest</Text>
         </Box>
       </GridItem>
       {coreTemps.map((core) => (
-        <CoreTempView key={core.name} {...core} />
+        <TempView key={core.name} type="temp" {...core} />
       ))}
     </Grid>
   );

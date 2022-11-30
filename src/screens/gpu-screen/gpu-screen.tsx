@@ -1,10 +1,11 @@
 import React from "react";
-import { Box, ScrollBox } from "react-gjs-renderer";
+import { Align, Box } from "react-gjs-renderer";
+import { GpuTemps } from "../../components/gpu-temps/gpu-temps";
 
 export const GpuScreen = () => {
   return (
-    <ScrollBox useChildHeight useChildWidth>
-      <Box></Box>
-    </ScrollBox>
+    <Box verticalAlign={Align.FILL}>
+      <GpuTemps />
+    </Box>
   );
 };
