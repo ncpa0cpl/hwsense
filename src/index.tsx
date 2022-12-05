@@ -1,37 +1,30 @@
 import React from "react";
-import { Box, render, ScrollBox, StackItem } from "react-gjs-renderer";
-import { StackRouter } from "./components/stack-router/stack-router";
+import { Align, Box, Orientation, render, ScrollBox } from "react-gjs-renderer";
+import { MainNavigator } from "./components/main-navigator/main-navigator";
 import { TempProber } from "./components/temp-prober.ts/temp-prober";
-import { CpuScreen } from "./screens/cpu-screen/cpu-screen";
-import { GpuScreen } from "./screens/gpu-screen/gpu-screen";
+import { MainRoutes, Stack } from "./screens/navigation";
 import { Win } from "./window-context";
 
 const App = () => {
-  return (
-    <StackRouter
-      wrapper={(children) => (
-        <ScrollBox useChildHeight useChildWidth>
-          {children}
-        </ScrollBox>
-      )}
-    >
-      <StackItem label="CPU">
-        <CpuScreen />
-      </StackItem>
-      <StackItem label="GPU">
-        <GpuScreen />
-      </StackItem>
-    </StackRouter>
-  );
+  return <MainRoutes />;
 };
 
 render(
   <Win title="HwSense">
-    <ScrollBox margin={[25, 10, 25, 0]} useChildHeight useChildWidth>
-      <Box>
-        <App />
-        <TempProber />
-      </Box>
-    </ScrollBox>
+    <Stack.StackRoot>
+      <ScrollBox verticalAlign={Align.FILL} horizontalAlign={Align.FILL}>
+        <Box
+          verticalAlign={Align.FILL}
+          horizontalAlign={Align.FILL}
+          orientation={Orientation.HORIZONTAL}
+        >
+          <MainNavigator />
+          <Box margin={[25, 10, 25, 0]}>
+            <App />
+          </Box>
+          <TempProber />
+        </Box>
+      </ScrollBox>
+    </Stack.StackRoot>
   </Win>
 );
