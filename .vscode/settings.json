@@ -10,6 +10,12 @@
         "git-hook-tasks.config.json"
       ],
       "url": "./node_modules/git-hook-tasks/dist/config/json-schema.json"
+    },
+    {
+      "fileMatch": [
+        "react-gtk.config.json"
+      ],
+      "url": "./node_modules/react-gtk/dist/config-schema.json"
     }
   ]
 }
