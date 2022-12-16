@@ -125,7 +125,7 @@ export const createStack = <T extends StackTree<any, any>>(
     props: any
   ) => {
     const { screens, wrapper, ...rest } = props;
-    const { Stack, navigate } = useStack();
+    const { Stack, navigate: navigateIntrinsic } = useStack();
 
     const render = () => {
       return (
@@ -135,13 +135,25 @@ export const createStack = <T extends StackTree<any, any>>(
               <StackScreenWrapper
                 key={screen.uid}
                 {...screen}
-                navigate={navigate}
+                navigate={navigateIntrinsic}
               />
             )
           )}
         </Stack>
       );
     };
+
+    React.useEffect(() => {
+      const defaultScreen = screens.find(
+        (s: StackSwitchProps<string>["screens"][number]) => s.isDefault
+      );
+
+      if (defaultScreen) {
+        navigate(defaultScreen.uid);
+      } else if (screens[0]) {
+        navigate(screens[0].uid);
+      }
+    }, []);
 
     if (wrapper) {
       return wrapper(render());

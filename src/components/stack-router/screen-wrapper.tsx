@@ -8,6 +8,7 @@ export type StackSwitchProps<P extends string> = {
     uid: P;
     label: string;
     component: React.ReactElement;
+    isDefault?: boolean;
   }>;
   wrapper?: (children: React.ReactElement) => React.ReactElement;
 } & StackProps;

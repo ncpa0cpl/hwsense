@@ -1,8 +1,8 @@
-const resolve = require("esbuild-plugin-resolve");
+import resolve from "esbuild-plugin-resolve";
+import { BuildConfig } from "react-gnome";
 
-module.exports = () => {
-  /** @type {import("react-gtk").Config} */
-  const config = {
+export default () => {
+  const config: BuildConfig = {
     entrypoint: "./src/index.tsx",
     outDir: "./dist",
     esbuildPlugins: [
@@ -15,6 +15,9 @@ module.exports = () => {
         react: "/home/owner/Documents/hwsense/node_modules/react",
       }),
     ],
+    giVersions: {
+      Soup: "2.4",
+    },
   };
 
   return config;

@@ -6,7 +6,7 @@ export const Win = ({
   title,
 }: React.PropsWithChildren<{ title?: string }>) => {
   return (
-    <Window title={title} defaultHeight={800} minWidth={660} onDestroy={exit}>
+    <Window title={title} defaultHeight={800} minWidth={670} onDestroy={exit}>
       {children}
     </Window>
   );
